@@ -24,7 +24,7 @@ class CommandTests(SimpleTestCase):
         call_command('wait_for_db')
         patched_check.assert_called_once_with(databases=['default'])
 
-    @patch('time.sleep')
+    @patch('core.management.commands.wait_for_db.time.sleep')
     def test_wait_for_db_delay(self, patched_sleep: Mock, patched_check: Mock):
         """
         Test Waiting For Database if getting Operational Error or psycopg2Error
