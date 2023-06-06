@@ -5,22 +5,19 @@ services:
     build:
       context: .
       args:
-        - DEV=true
+        - DJANGO_ENV=development
     ports:
       - "8000:8000"
+    env_file:
+      - ./.env
     volumes:
-      - ./app:/app
+      - .:/recipe-app
     command: >
       sh -c "
              python manage.py wait_for_db &&
+             python manage.py makemigrations &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
-    environment:
-      - DB_HOST=db
-      - DB_NAME=devdb
-      - DB_USER=devuser
-      - DB_PASS=changeme
-      - DB_PORT=5432
     depends_on:
       - db
 
@@ -28,10 +25,11 @@ services:
     image: postgres:13-alpine
     volumes:
       - dev-db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=devdb
-      - POSTGRES_USER=devuser
-      - POSTGRES_PASSWORD=changeme
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
 
 volumes:
   dev-db-data:
